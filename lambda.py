@@ -6,6 +6,7 @@
 ## Made on October 22nd
 
 import json
+import os
 # import boto3
 from boto3 import resource
 from boto3.dynamodb.conditions import Key,Attr
@@ -14,7 +15,7 @@ from boto3.dynamodb.conditions import Key,Attr
 dynamodb_resource = resource('dynamodb')
 
 #DynamoDB Table
-table = dynamodb_resource.Table('users')
+table = dynamodb_resource.Table(os.environ['table'])
 
 def lambda_handler(event,context):
     # Check if the POST has the data required
@@ -27,5 +28,9 @@ def lambda_handler(event,context):
     # Get the information from the DynamoDB Table
     response = table.query(
         Select='ALL_ATTRIBUTES',
-        FilterExpression=Attr('type').eq(event['type']) and Attr('rh').eq(event['rh']) and Attr('city').eq(event['city'])
+        KeyConditionExpression=Key('type').eq(event['type']),
+        FilterExpression=Attr('rh').eq(event['rh']) and Attr('city').eq(event['city'])
     )
+    
+    print(response)
+    
